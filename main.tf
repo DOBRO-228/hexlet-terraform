@@ -7,30 +7,36 @@ terraform {
       // Версия может обновиться
       version = "~> 2.0"
     }
+    datadog = {
+      source = "DataDog/datadog"
+      version = "3.26.0"
+    }
   }
 }
 
-// Terraform должен знать ключ, для выполнения команд по API
-
-// Определение переменной, которую нужно будет задать
 variable "do_token" {}
-
-// Установка значения переменной
 provider "digitalocean" {
   token = var.do_token
 }
 
-resource "digitalocean_droplet" "terraform_web1" {
-  image  = "ubuntu-22-10-x64"
 
-  name   = "web1"
-  region = "SGP1"
-  size   = "s-1vcpu-1gb"
+variable "datadog_token" {}
+provider "datadog" {
+  api_key = var.datadog_token
 }
 
-# resource "digitalocean_droplet" "terraform_web2" {
-#   image  = "ubuntu-22-10-x64"
-#   name   = "terraform-web-2"
-#   region = "SGP1"
-#   size   = "s-1vcpu-1gb"
-# }
+resource "digitalocean_droplet" "terraform_web1" {
+  image  = var.ubuntu_image
+  name   = "web1"
+  region = var.region
+  size   = var.size
+  monitoring = true
+}
+
+resource "digitalocean_droplet" "terraform_web2" {
+  image  = var.ubuntu_image
+  name   = "web2"
+  region = var.region
+  size   = var.size
+  monitoring = true
+}
