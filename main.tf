@@ -40,3 +40,35 @@ resource "digitalocean_droplet" "terraform_web2" {
   size   = var.size
   monitoring = true
 }
+
+resource "digitalocean_droplet" "terraform_web3" {
+  image  = var.ubuntu_image
+  name   = "web3"
+  region = var.region
+  size   = var.size
+  monitoring = true
+}
+
+resource "digitalocean_loadbalancer" "terraform_loadbalancer" {
+  name   = "loadbalancer-2"
+  region = "sgp1"
+
+  forwarding_rule {
+    entry_port     = 80
+    entry_protocol = "http"
+
+    target_port     = 80
+    target_protocol = "http"
+  }
+
+  healthcheck {
+    port     = 22
+    protocol = "tcp"
+  }
+
+  droplet_ids = [
+    digitalocean_droplet.terraform_web1.id,
+    digitalocean_droplet.terraform_web2.id,
+    digitalocean_droplet.terraform_web3.id,
+  ]
+}
